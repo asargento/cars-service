@@ -1,0 +1,46 @@
+{
+  "name": "cars-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "deploy": "osls deploy",
+    "remove": "osls remove",
+    "deploy:dev": "osls deploy --stage dev",
+    "remove:dev": "osls remove --stage dev",
+    "invoke:local": "osls invoke local -f api -p events/http-api.json",
+    "package": "osls package",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/event-handler": "^2.32.0",
+    "@aws-lambda-powertools/logger": "^2.32.0",
+    "@aws-lambda-powertools/metrics": "^2.32.0",
+    "@aws-lambda-powertools/parser": "^2.32.0",
+    "@aws-lambda-powertools/tracer": "^2.32.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/aws-lambda": "^8.10.159",
+    "esbuild": "^0.25.10",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "osls": "^3.63.2",
+    "prettier": "^3.6.2",
+    "serverless-esbuild": "^1.56.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "vitest": "^3.2.4"
+  }
+}

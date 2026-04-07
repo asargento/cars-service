@@ -1,0 +1,53 @@
+service: cars-service
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'eu-west-1'}
+  memorySize: 256
+  timeout: 10
+  tracing:
+    lambda: true
+  environment:
+    POWERTOOLS_SERVICE_NAME: ${self:service}
+    POWERTOOLS_METRICS_NAMESPACE: CarsService
+    LOG_LEVEL: INFO
+
+plugins:
+  - serverless-esbuild
+  # After esbuild, scope the build dir as CJS (see scripts/serverless-lambda-cjs-scope.cjs).
+  - ./scripts/serverless-lambda-cjs-scope.cjs
+
+custom:
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    target: node24
+    platform: node
+    # CJS so osls invoke local can require() the built handler (.mjs is not supported there).
+    format: cjs
+
+functions:
+  api:
+    handler: src/handlers/api.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+      - httpApi:
+          path: /
+          method: ANY
+  onCarSubmittedHandler:
+    handler: src/handlers/on-car-submitted.handler
+    events:
+      - eventBridge:
+          # Omit `eventBus` for the default bus. Setting `eventBus: default` makes osls emit a
+          # Lambda Permission SourceArn `...:rule/default/<ruleName>`, which is invalid for the
+          # default bus (correct ARN is `...:rule/<ruleName>`) and causes FailedInvocations.
+          pattern:
+            detail-type:
+              - CarSubmitted
