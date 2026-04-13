@@ -1,4 +1,5 @@
 import type { Logger } from '@aws-lambda-powertools/logger';
+import type { SecretsProvider } from '@aws-lambda-powertools/parameters/secrets';
 import type { UseCaseFactory } from '@application/factories/use-case-factory';
 import { vi, type Mock } from 'vitest';
 
@@ -24,6 +25,17 @@ export function createTestLogger(): TestLoggerDouble & Logger {
     error: vi.fn(),
   };
   return double as TestLoggerDouble & Logger;
+}
+
+export type TestSecretsProviderDouble = {
+  get: Mock;
+};
+
+/** Minimal Secrets Manager double for authorizer tests (only `get` is used). */
+export function createSecretsProvider(): TestSecretsProviderDouble & SecretsProvider {
+  return {
+    get: vi.fn(),
+  } as TestSecretsProviderDouble & SecretsProvider;
 }
 
 export type MockedUseCaseFactory = {

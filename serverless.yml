@@ -15,6 +15,13 @@ provider:
     POWERTOOLS_SERVICE_NAME: ${self:service}
     POWERTOOLS_METRICS_NAMESPACE: CarsService
     LOG_LEVEL: INFO
+  httpApi:
+    authorizers:
+      carsApiAuthorizer:
+        type: request
+        functionName: apiAuthorizer
+        identitySource:
+          - $request.header.Authorization
 
 plugins:
   - serverless-esbuild
@@ -36,11 +43,12 @@ functions:
     handler: src/handlers/api.handler
     events:
       - httpApi:
+          authorizer: carsApiAuthorizer
           path: /{proxy+}
           method: ANY
       - httpApi:
-          path: /
-          method: ANY
+          path: /health
+          method: GET
   onCarSubmittedHandler:
     handler: src/handlers/on-car-submitted.handler
     events:
@@ -51,3 +59,42 @@ functions:
           pattern:
             detail-type:
               - CarSubmitted
+  apiAuthorizer:
+    handler: src/handlers/api-authorizer.handler
+    role: !GetAtt apiAuthorizerRole.Arn
+    environment:
+      API_KEY_SECRET_ARN: !Ref carsApiKeySecret
+
+resources:
+  Resources:
+    carsApiKeySecret:
+      Type: AWS::SecretsManager::Secret
+      Properties:
+        Name: CarsServiceApiKey
+        Description: API key for Cars Service
+        GenerateSecretString:
+          PasswordLength: 16
+          ExcludePunctuation: true
+    apiAuthorizerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:provider.stage}-${self:service}-apiAuthorizer
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+          - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
+        Policies:
+          - PolicyName: CarsApiAuthorizerSecretsPolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - secretsmanager:GetSecretValue
+                  Resource: !Ref carsApiKeySecret

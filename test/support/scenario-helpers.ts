@@ -1,4 +1,10 @@
-import type { APIGatewayProxyEventV2, Context, EventBridgeEvent } from 'aws-lambda';
+import type {
+  APIGatewayProxyEventV2,
+  APIGatewayRequestAuthorizerEventV2,
+  Context,
+  EventBridgeEvent,
+} from 'aws-lambda';
+
 import { randomUUID } from 'node:crypto';
 import { vi } from 'vitest';
 
@@ -60,11 +66,24 @@ export function createHttpApiV2Event(options: {
   };
 }
 
+/** Minimal REQUEST authorizer event (handler only needs `methodArn` and `headers`). */
+export function createRequestAuthorizerEvent(
+  options: {
+    methodArn?: string;
+    headers?: Record<string, string | undefined>;
+  } = {}
+): APIGatewayRequestAuthorizerEventV2 {
+  return {
+    routeArn:
+      options.methodArn ?? 'arn:aws:execute-api:eu-west-1:123456789012:test-api/test/GET/health',
+    headers: options.headers,
+  } as APIGatewayRequestAuthorizerEventV2;
+}
+
 /** Minimal EventBridge envelope for `detail-type: CarSubmitted` tests. */
-export function createCarSubmittedEventBridgeEvent(detail: unknown): EventBridgeEvent<
-  'CarSubmitted',
-  unknown
-> {
+export function createCarSubmittedEventBridgeEvent(
+  detail: unknown
+): EventBridgeEvent<'CarSubmitted', unknown> {
   return {
     version: '0',
     id: randomUUID(),
