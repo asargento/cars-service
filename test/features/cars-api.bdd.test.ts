@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { Car } from '@domain/entities';
 import { CarNotFoundError } from '@domain/errors';
-import { createApiHandler } from '@/handlers/api-handler-factory';
+import { createApiHandler } from '@/handlers/rest/api-handler-factory';
 import { CarResponseSchema } from '@/handlers/schemas';
 import {
   act,

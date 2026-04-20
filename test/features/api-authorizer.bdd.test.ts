@@ -7,7 +7,7 @@ import {
 import { createSecretsProvider, createTestLogger } from '../support/mock-api-deps';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createApiAuthorizerHandler } from '@/handlers/api-authorizer-factory';
+import { createApiAuthorizerHandler } from '@/handlers/rest/api-authorizer-factory';
 
 /** Matches deployed shape (`!Ref` secret); stubbed so the handler resolves the same id as in production. */
 const TEST_API_KEY_SECRET_ARN =

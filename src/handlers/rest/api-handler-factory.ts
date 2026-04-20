@@ -8,10 +8,14 @@ import { type Logger } from '@aws-lambda-powertools/logger';
 import { NotFoundError, Router } from '@aws-lambda-powertools/event-handler/http';
 import { type HandlerResponse } from '@aws-lambda-powertools/event-handler/types';
 import type { UseCaseFactory } from '@application/factories/use-case-factory';
-import { type CarResponseProps, CarResponseSchema, CreateCarRequestSchema } from './schemas';
+import {
+  type CarResponseProps,
+  CarResponseSchema,
+  CreateCarRequestSchema,
+} from '@/handlers/schemas';
 import { CarNotFoundError } from '@domain/errors';
 
-export type { CarCreateRequestProps as CarCreateProps } from './schemas';
+export type { CarCreateRequestProps as CarCreateProps } from '@/handlers/schemas';
 
 export type CreateApiHandlerOptions = {
   logger: Logger;

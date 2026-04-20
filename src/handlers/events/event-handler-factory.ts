@@ -2,7 +2,7 @@ import type { Context } from 'aws-lambda';
 
 import { type Logger } from '@aws-lambda-powertools/logger';
 import type { UseCaseFactory } from '@application/factories/use-case-factory';
-import { CarSubmittedDetailSchema } from './schemas';
+import { CarSubmittedDetailSchema } from '../schemas';
 import { EventBridgeEnvelope } from '@aws-lambda-powertools/parser/envelopes/eventbridge';
 import type { EventBridgeEvent } from '@aws-lambda-powertools/parser/types';
 

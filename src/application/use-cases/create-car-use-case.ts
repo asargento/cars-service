@@ -1,6 +1,6 @@
 import { Car } from '@domain/entities';
 import { UseCase } from './use-case';
-import { type CarCreateProps } from '@/handlers/api-handler-factory';
+import { type CarCreateProps } from '@domain/entities/car.entity';
 
 export class CreateCarUseCase extends UseCase<Car, CarCreateProps> {
   async execute(carProps: CarCreateProps): Promise<Car> {

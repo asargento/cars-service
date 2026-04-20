@@ -1,11 +1,15 @@
-import { type CarCreateProps } from '@/handlers/api-handler-factory';
 import { randomUUID } from 'crypto';
 
-export interface CarProps extends CarCreateProps {
+export interface CarProps {
   id?: string;
+  make: string;
+  model: string;
+  year: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export type CarCreateProps = Omit<CarProps, 'id' | 'createdAt' | 'updatedAt'>;
 
 /** Wire format for `JSON.stringify(car)` — explicit surface, no class internals. */
 export type CarJson = {
@@ -46,7 +50,7 @@ export class Car {
     };
   }
 
-  static create(props: Omit<CarProps, 'id' | 'createdAt' | 'updatedAt'>): Car {
+  static create(props: CarCreateProps): Car {
     return new Car(props);
   }
 

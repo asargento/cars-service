@@ -1,6 +1,6 @@
 import { Car } from '@domain/entities';
 import { describe, expect, it } from 'vitest';
-import { createOnCarSubmittedHandler } from '@/handlers/event-handler-factory';
+import { createOnCarSubmittedHandler } from '@/handlers/events/event-handler-factory';
 import {
   act,
   arrange,
