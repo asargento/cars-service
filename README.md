@@ -55,13 +55,15 @@ src/
     errors/               # Domain errors (e.g. car-not-found.error.ts)
     repositories/         # Ports (e.g. cars-repository.port.ts) + barrel index.ts
   application/            # Use cases, use-case factory
-  infrastructure/       # Adapters (e.g. in-memory repository)
+  infrastructure/         # Adapters (e.g. in-memory repository)
   handlers/
-    api.ts                  # HTTP Lambda composition root → `handler`
-    api-handler-factory.ts  # `createApiHandler` + HTTP routes & Zod
-    on-car-submitted.ts     # EventBridge Lambda composition root → `handler`
-    event-handler-factory.ts # `createOnCarSubmittedHandler` (validates `detail`, create-car use case)
-    schemas.ts              # Zod schemas shared by HTTP and events
+    events/               
+      on-car-submitted.ts      # EventBridge Lambda composition root → `handler`
+      event-handler-factory.ts # `createOnCarSubmittedHandler` (validates `detail`, create-car use case)
+    rest/
+      api.ts                   # HTTP Lambda composition root → `handler`
+      api-handler-factory.ts   # `createApiHandler` + HTTP routes & Zod
+    schemas.ts                 # Zod schemas shared by HTTP and events
 test/
   domain/                 # Entity + domain error unit tests
   features/               # BDD-style API + EventBridge handler tests (mocked logger + factory)
