@@ -40,7 +40,7 @@ custom:
 
 functions:
   api:
-    handler: src/handlers/api.handler
+    handler: src/infrastructure/rest/api.handler
     events:
       - httpApi:
           authorizer: carsApiAuthorizer
@@ -50,7 +50,7 @@ functions:
           path: /health
           method: GET
   onCarSubmittedHandler:
-    handler: src/handlers/on-car-submitted.handler
+    handler: src/infrastructure/events/on-car-submitted.handler
     events:
       - eventBridge:
           # Omit `eventBus` for the default bus. Setting `eventBus: default` makes osls emit a
@@ -60,7 +60,7 @@ functions:
             detail-type:
               - CarSubmitted
   apiAuthorizer:
-    handler: src/handlers/api-authorizer.handler
+    handler: src/infrastructure/rest/api-authorizer.handler
     role: !GetAtt apiAuthorizerRole.Arn
     environment:
       API_KEY_SECRET_ARN: !Ref carsApiKeySecret
