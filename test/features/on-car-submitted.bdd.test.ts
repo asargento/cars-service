@@ -1,6 +1,3 @@
-import { Car } from '@domain/entities';
-import { describe, expect, it } from 'vitest';
-import { createOnCarSubmittedHandler } from '@/handlers/events/event-handler-factory';
 import {
   act,
   arrange,
@@ -9,6 +6,10 @@ import {
   createLambdaTestContext,
 } from '../support/scenario-helpers';
 import { createMockedUseCaseFactory, createTestLogger } from '../support/mock-api-deps';
+import { describe, expect, it } from 'vitest';
+
+import { Car } from '@domain/entities';
+import { createOnCarSubmittedHandler } from '@infrastructure/events/event-handler-factory';
 
 describe('Feature: CarSubmitted EventBridge handler', () => {
   describe('Scenario: Valid detail', () => {

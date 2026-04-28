@@ -4,10 +4,10 @@ import {
   assertOutcome,
   createRequestAuthorizerEvent,
 } from '../support/scenario-helpers';
-import { createSecretsProvider, createTestLogger } from '../support/mock-api-deps';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createSecretsProvider, createTestLogger } from '../support/mock-api-deps';
 
-import { createApiAuthorizerHandler } from '@/handlers/rest/api-authorizer-factory';
+import { createApiAuthorizerHandler } from '@infrastructure/rest/api-authorizer-factory';
 
 /** Matches deployed shape (`!Ref` secret); stubbed so the handler resolves the same id as in production. */
 const TEST_API_KEY_SECRET_ARN =

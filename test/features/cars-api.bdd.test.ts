@@ -1,11 +1,3 @@
-import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
-import { randomUUID } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
-import { z } from 'zod';
-import { Car } from '@domain/entities';
-import { CarNotFoundError } from '@domain/errors';
-import { createApiHandler } from '@/handlers/rest/api-handler-factory';
-import { CarResponseSchema } from '@/handlers/schemas';
 import {
   act,
   arrange,
@@ -14,6 +6,15 @@ import {
   createLambdaTestContext,
 } from '../support/scenario-helpers';
 import { createMockedUseCaseFactory, createTestLogger } from '../support/mock-api-deps';
+import { describe, expect, it } from 'vitest';
+
+import type { APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
+import { Car } from '@domain/entities';
+import { CarNotFoundError } from '@domain/errors';
+import { CarResponseSchema } from '@shared/schemas';
+import { createApiHandler } from '@infrastructure/rest/api-handler-factory';
+import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
 
 function parseJsonBody(res: APIGatewayProxyStructuredResultV2): unknown {
   if (typeof res.body !== 'string') {

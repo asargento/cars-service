@@ -12,10 +12,10 @@ import {
   type CarResponseProps,
   CarResponseSchema,
   CreateCarRequestSchema,
-} from '@/handlers/schemas';
+} from '@shared/schemas';
 import { CarNotFoundError } from '@domain/errors';
 
-export type { CarCreateRequestProps as CarCreateProps } from '@/handlers/schemas';
+export type { CarCreateRequestProps as CarCreateProps } from '@shared/schemas';
 
 export type CreateApiHandlerOptions = {
   logger: Logger;

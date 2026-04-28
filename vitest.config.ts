@@ -1,6 +1,6 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
@@ -10,6 +10,7 @@ export default defineConfig({
       '@domain': path.resolve(root, 'src/domain'),
       '@application': path.resolve(root, 'src/application'),
       '@infrastructure': path.resolve(root, 'src/infrastructure'),
+      '@shared': path.resolve(root, 'src/shared'),
       '@': path.resolve(root, 'src'),
     },
   },
