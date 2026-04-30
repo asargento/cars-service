@@ -52,26 +52,81 @@ The `serverless` CLI is provided by the **`osls`** dev dependency; `npm run depl
 src/
   domain/
     entities/             # Aggregates (e.g. car.entity.ts) + barrel index.ts
-    errors/               # Domain errors (e.g. car-not-found.error.ts)
-    repositories/         # Ports (e.g. cars-repository.port.ts) + barrel index.ts
-  application/            # Use cases, use-case factory
-  infrastructure/         # Adapters (e.g. in-memory repository)
-  handlers/
-    events/               
-      on-car-submitted.ts      # EventBridge Lambda composition root → `handler`
-      event-handler-factory.ts # `createOnCarSubmittedHandler` (validates `detail`, create-car use case)
+    errors/               # Domain errors (index.ts exports CarNotFoundError)
+    repositories/         # Ports (e.g. cars-repository.ts) + barrel index.ts
+  application/
+    factories/
+      use-case-factory.ts       # createUseCaseFactory (wires use cases with deps)
+    use-cases/                  # ListCars / GetCarDetails / CreateCar + UseCase base
+  infrastructure/         # Adapters
+    events/
+      on-car-submitted.ts       # EventBridge Lambda composition root → handler
+      event-handler-factory.ts  # createOnCarSubmittedHandler (validates detail, create-car use case)
     rest/
-      api.ts                   # HTTP Lambda composition root → `handler`
-      api-handler-factory.ts   # `createApiHandler` + HTTP routes & Zod
-    schemas.ts                 # Zod schemas shared by HTTP and events
+      api.ts                    # HTTP Lambda composition root → handler
+      api-handler-factory.ts    # createApiHandler + HTTP routes & Zod
+      api-authorizer.ts         # Lambda authorizer composition root → handler
+      api-authorizer-factory.ts # createApiAuthorizerHandler (API key / Secrets Manager)
+    repositories/
+      car-repository-memory.ts  # In-memory CarsRepository adapter
+  shared/
+    schemas.ts                  # Zod schemas shared by HTTP and events
 test/
   domain/                 # Entity + domain error unit tests
-  features/               # BDD-style API + EventBridge handler tests (mocked logger + factory)
+  features/               # BDD-style API + EventBridge + authorizer handler tests (mocked logger + factory)
   application/            # Use-case tests (mocked repository)
   support/                # API / EventBridge event builders, mocks, arrange/act/assert helpers
 ```
 
-Path aliases (see [`tsconfig.json`](./tsconfig.json)): `@domain/*`, `@application/*`, `@infrastructure/*`, `@/*` → `src/*`. Prefer **`@domain/entities`**, **`@domain/errors`**, and **`@domain/repositories`** (folder `index.ts` barrels). TypeScript uses **`moduleResolution: "bundler"`** so imports omit `.js` extensions; resolution is handled by esbuild (deploy) and Vitest (tests).
+Path aliases (see [`tsconfig.json`](./tsconfig.json)): `@domain/*`, `@application/*`, `@infrastructure/*`, `@shared/*`, `@/*` → `src/*`. Prefer **`@domain/entities`**, **`@domain/errors`**, and **`@domain/repositories`** (folder `index.ts` barrels). TypeScript uses **`moduleResolution: "bundler"`** so imports omit `.js` extensions; resolution is handled by esbuild (deploy) and Vitest (tests).
+
+This repository uses a single bounded context (`cars`) to keep the example small. When the service grows to cover multiple bounded contexts, give each one its own self-contained module under `src/contexts/<context>/`, repeating the same layered shape (`domain` / `application` / `infrastructure`) inside it. Contexts stay isolated and only collaborate through explicit, published interfaces (domain events on EventBridge, or thin anti-corruption layers in `infrastructure/`); `src/shared/` is reserved for cross-context primitives (e.g. shared Zod schemas, common types) and stays deliberately small.
+
+```
+src/
+  contexts/
+    cars/
+      domain/
+        entities/                   # Car aggregate + barrel index.ts
+        errors/                     # CarNotFoundError, ...
+        repositories/               # CarsRepository port + barrel index.ts
+      application/
+        factories/
+          use-case-factory.ts       # createCarsUseCaseFactory
+        use-cases/                  # ListCars / GetCarDetails / CreateCar
+      infrastructure/
+        events/                     # on-car-submitted.ts + factory
+        rest/                       # api.ts, api-handler-factory.ts, authorizer
+        repositories/               # car-repository-memory.ts (or DynamoDB, ...)
+    customers/                      # Example second bounded context
+      domain/
+        entities/                   # Customer aggregate + barrel index.ts
+        errors/
+        repositories/               # CustomersRepository port
+      application/
+        factories/
+          use-case-factory.ts       # createCustomersUseCaseFactory
+        use-cases/                  # RegisterCustomer / GetCustomer / ...
+      infrastructure/
+        rest/                       # Customer-specific routes / handler factory
+        repositories/               # customer-repository-*.ts
+        events/                     # Subscribers to other contexts' events (ACL)
+  shared/
+    schemas.ts                      # Cross-context Zod primitives (kept minimal)
+test/
+  contexts/
+    cars/
+      domain/                       # Per-context unit tests mirror src/contexts/cars
+      application/
+      features/
+    customers/
+      domain/
+      application/
+      features/
+  support/                          # Cross-context test helpers (event builders, mocks)
+```
+
+Each context exposes its public surface through its own composition root (e.g. `infrastructure/rest/api.ts`, `infrastructure/events/...`) and a use-case factory; nothing in `cars/` should import from `customers/` directly. Path aliases extend naturally — add `@cars/*` → `src/contexts/cars/*` and `@customers/*` → `src/contexts/customers/*` in [`tsconfig.json`](./tsconfig.json) (and mirror them in [`vitest.config.ts`](./vitest.config.ts)) so each context keeps its own short import prefix.
 
 ## API (HTTP)
 
